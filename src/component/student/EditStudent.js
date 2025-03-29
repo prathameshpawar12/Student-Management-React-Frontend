@@ -1,15 +1,10 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-
 
 const EditStudent = () => {
     let navigate = useNavigate();
-
-    const{id}=useParams();
-
-
-
+    const { id } = useParams();
 
 	const [student, setStudent] = useState({
 		firstname: "",
@@ -17,24 +12,21 @@ const EditStudent = () => {
 		email: "",
 		department: "",
 	});
-	const {
-		firstname,
-		lastname,
-		email,
-		department,
-	} = student;
 
- const loadStudent = async()=>{
-        const result =await axios.get(`https://student-management-system-spring-production.up.railway.app/api/v1/${id}`);
-        setStudent(result.data)
-       
-    };
-    useEffect(()=>{
-        loadStudent();
-    },[]);
+	const { firstname, lastname, email, department } = student;
 
-   
+	// ✅ Wrap loadStudent with useCallback to prevent re-creation on every render
+	const loadStudent = useCallback(async () => {
+		const result = await axios.get(
+			`https://student-management-system-spring-production.up.railway.app/api/v1/${id}`
+		);
+		setStudent(result.data);
+	}, [id]); // ✅ Depend only on id
 
+	// ✅ Now useEffect won't trigger infinitely
+	useEffect(() => {
+		loadStudent();
+	}, [loadStudent]);
 
 	const handleInputChange = (e) => {
 		setStudent({
@@ -42,6 +34,7 @@ const EditStudent = () => {
 			[e.target.name]: e.target.value,
 		});
 	};
+
 	const updateStudent = async (e) => {
 		e.preventDefault();
 		await axios.put(
@@ -53,12 +46,10 @@ const EditStudent = () => {
 
 	return (
 		<div className="col-sm-8 py-2 px-5 offset-2 shadow">
-			<h2 className="mt-5"> Edit Student</h2>
-			<form onSubmit={(e) => updateStudent(e)}>
+			<h2 className="mt-5">Edit Student</h2>
+			<form onSubmit={updateStudent}>
 				<div className="input-group mb-5">
-					<label
-						className="input-group-text"
-						htmlFor="fristname">
+					<label className="input-group-text" htmlFor="firstname">
 						First Name
 					</label>
 					<input
@@ -68,14 +59,12 @@ const EditStudent = () => {
 						id="firstname"
 						required
 						value={firstname}
-						onChange={(e) => handleInputChange(e)}
+						onChange={handleInputChange}
 					/>
 				</div>
 
 				<div className="input-group mb-5">
-					<label
-						className="input-group-text"
-						htmlFor="lastname">
+					<label className="input-group-text" htmlFor="lastname">
 						Last Name
 					</label>
 					<input
@@ -85,14 +74,12 @@ const EditStudent = () => {
 						id="lastname"
 						required
 						value={lastname}
-						onChange={(e) => handleInputChange(e)}
+						onChange={handleInputChange}
 					/>
 				</div>
 
 				<div className="input-group mb-5">
-					<label
-						className="input-group-text"
-						htmlFor="email">
+					<label className="input-group-text" htmlFor="email">
 						Your Email
 					</label>
 					<input
@@ -102,14 +89,12 @@ const EditStudent = () => {
 						id="email"
 						required
 						value={email}
-						onChange={(e) => handleInputChange(e)}
+						onChange={handleInputChange}
 					/>
 				</div>
 
 				<div className="input-group mb-5">
-					<label
-						className="input-group-text"
-						htmlFor="department">
+					<label className="input-group-text" htmlFor="department">
 						Department
 					</label>
 					<input
@@ -119,24 +104,19 @@ const EditStudent = () => {
 						id="department"
 						required
 						value={department}
-						onChange={(e) => handleInputChange(e)}
+						onChange={handleInputChange}
 					/>
 				</div>
 
 				<div className="row mb-5">
 					<div className="col-sm-2">
-						<button
-							type="submit"
-							className="btn btn-outline-success btn-lg">
+						<button type="submit" className="btn btn-outline-success btn-lg">
 							Save
 						</button>
 					</div>
 
 					<div className="col-sm-2">
-						<Link
-							to={"/view-students"}
-							type="submit"
-							className="btn btn-outline-warning btn-lg">
+						<Link to={"/view-students"} className="btn btn-outline-warning btn-lg">
 							Cancel
 						</Link>
 					</div>
@@ -144,7 +124,6 @@ const EditStudent = () => {
 			</form>
 		</div>
 	);
-}
+};
 
-export default EditStudent
-
+export default EditStudent;
