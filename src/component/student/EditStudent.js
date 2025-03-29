@@ -24,16 +24,16 @@ const EditStudent = () => {
 		department,
 	} = student;
 
-
-    useEffect(()=>{
-        loadStudent();
-    },[]);
-
-    const loadStudent = async()=>{
+ const loadStudent = async()=>{
         const result =await axios.get(`https://student-management-system-spring-production.up.railway.app/api/v1/${id}`);
         setStudent(result.data)
        
     };
+    useEffect(()=>{
+        loadStudent();
+    },[]);
+
+   
 
 
 	const handleInputChange = (e) => {
